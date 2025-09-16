@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base de Datos - Microservicios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .api-key-input {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .api-key-input input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .data-table th {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .stat-card h3 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+        
+        .error {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .success {
+            background: #27ae60;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: #bdc3c7;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 16px;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗄️ Base de Datos - Microservicios</h1>
+            <p>Interfaz de gestión para usuarios y pedidos</p>
+        </div>
+        
+        <div class="content">
+            <!-- API Key Input -->
+            <div class="api-key-input">
+                <h3>🔑 Configuración de API Key</h3>
+                <input type="text" id="apiKey" placeholder="Ingresa tu API Key" value="74UIHTG984OJR094YTH49**-0573">
+                <button class="btn" onclick="setApiKey()">Configurar API Key</button>
+            </div>
+            
+            <!-- Stats -->
+            <div class="stats">
+                <div class="stat-card">
+                    <h3 id="totalUsuarios">-</h3>
+                    <p>Total Usuarios</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalPedidos">-</h3>
+                    <p>Total Pedidos</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="pedidosPendientes">-</h3>
+                    <p>Pedidos Pendientes</p>
+                </div>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('usuarios')">👥 Usuarios</button>
+                <button class="tab" onclick="showTab('pedidos')">📦 Pedidos</button>
+                <button class="tab" onclick="showTab('crear')">➕ Crear Nuevo</button>
+            </div>
+            
+            <!-- Usuarios Tab -->
+            <div id="usuarios" class="tab-content active">
+                <div class="section">
+                    <h2>👥 Gestión de Usuarios</h2>
+                    <button class="btn" onclick="loadUsuarios()">🔄 Actualizar Lista</button>
+                    <button class="btn btn-success" onclick="showTab('crear')">➕ Nuevo Usuario</button>
+                    <div id="usuariosTable"></div>
+                </div>
+            </div>
+            
+            <!-- Pedidos Tab -->
+            <div id="pedidos" class="tab-content">
+                <div class="section">
+                    <h2>📦 Gestión de Pedidos</h2>
+                    <button class="btn" onclick="loadPedidos()">🔄 Actualizar Lista</button>
+                    <button class="btn btn-success" onclick="showTab('crear')">➕ Nuevo Pedido</button>
+                    <div id="pedidosTable"></div>
+                </div>
+            </div>
+            
+            <!-- Crear Tab -->
+            <div id="crear" class="tab-content">
+                <div class="section">
+                    <h2>➕ Crear Nuevo Registro</h2>
+                    
+                    <!-- Crear Usuario -->
+                    <div class="form-section">
+                        <h3>👤 Nuevo Usuario</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nombre:</label>
+                                <input type="text" id="nombreUsuario" placeholder="Ej: Juan Pérez">
+                            </div>
+                            <div class="form-group">
+                                <label>Email:</label>
+                                <input type="email" id="emailUsuario" placeholder="Ej: juan@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Teléfono:</label>
+                                <input type="text" id="telefonoUsuario" placeholder="Ej: 555-1234">
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="crearUsuario()">Crear Usuario</button>
+                    </div>
+                    
+                    <!-- Crear Pedido -->
+                    <div class="form-section">
+                        <h3>📦 Nuevo Pedido</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Usuario ID:</label>
+                                <input type="number" id="usuarioIdPedido" placeholder="Ej: 1">
+                            </div>
+                            <div class="form-group">
+                                <label>Producto:</label>
+                                <input type="text" id="productoPedido" placeholder="Ej: Laptop">
+                            </div>
+                            <div class="form-group">
+                                <label>Cantidad:</label>
+                                <input type="number" id="cantidadPedido" value="1" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>Precio:</label>
+                                <input type="number" id="precioPedido" placeholder="Ej: 299.99" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>Estado:</label>
+                                <select id="estadoPedido">
+                                    <option value="pendiente">Pendiente</option>
+                                    <option value="completado">Completado</option>
+                                    <option value="cancelado">Cancelado</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="crearPedido()">Crear Pedido</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Messages -->
+            <div id="messages"></div>
+        </div>
+    </div>
+
+    <script>
+        let apiKey = '74UIHTG984OJR094YTH49**-0573';
+        
+        function setApiKey() {
+            apiKey = document.getElementById('apiKey').value;
+            showMessage('API Key configurada correctamente', 'success');
+            loadStats();
+        }
+        
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load data for the tab
+            if (tabName === 'usuarios') {
+                loadUsuarios();
+            } else if (tabName === 'pedidos') {
+                loadPedidos();
+            }
+        }
+        
+        function showMessage(message, type) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+            messagesDiv.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+        
+        async function loadStats() {
+            try {
+                // Load usuarios
+                const usuariosResponse = await fetch('http://localhost:5003/usuarios', {
+                    headers: { 'X-API-Key': apiKey }
+                });
+                const usuariosData = await usuariosResponse.json();
+                document.getElementById('totalUsuarios').textContent = usuariosData.total || 0;
+                
+                // Load pedidos
+                const pedidosResponse = await fetch('http://localhost:5003/pedidos', {
+                    headers: { 'X-API-Key': apiKey }
+                });
+                const pedidosData = await pedidosResponse.json();
+                document.getElementById('totalPedidos').textContent = pedidosData.total || 0;
+                
+                // Count pending pedidos
+                const pendientes = pedidosData.pedidos ? pedidosData.pedidos.filter(p => p.estado === 'pendiente').length : 0;
+                document.getElementById('pedidosPendientes').textContent = pendientes;
+                
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        async function loadUsuarios() {
+            try {
+                document.getElementById('usuariosTable').innerHTML = '<div class="loading">Cargando usuarios...</div>';
+                
+                const response = await fetch('http://localhost:5003/usuarios', {
+                    headers: { 'X-API-Key': apiKey }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                let tableHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Fecha Creación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                data.usuarios.forEach(usuario => {
+                    tableHTML += `
+                        <tr>
+                            <td>${usuario.id}</td>
+                            <td>${usuario.nombre}</td>
+                            <td>${usuario.email}</td>
+                            <td>${usuario.telefono}</td>
+                            <td>${usuario.fecha_creacion}</td>
+                            <td>
+                                <button class="btn btn-warning" onclick="editarUsuario(${usuario.id})">✏️</button>
+                                <button class="btn btn-danger" onclick="eliminarUsuario(${usuario.id})">🗑️</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                tableHTML += '</tbody></table>';
+                document.getElementById('usuariosTable').innerHTML = tableHTML;
+                
+            } catch (error) {
+                document.getElementById('usuariosTable').innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function loadPedidos() {
+            try {
+                document.getElementById('pedidosTable').innerHTML = '<div class="loading">Cargando pedidos...</div>';
+                
+                const response = await fetch('http://localhost:5003/pedidos', {
+                    headers: { 'X-API-Key': apiKey }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                let tableHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Producto</th>
+                                <th>Usuario</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                data.pedidos.forEach(pedido => {
+                    const estadoColor = pedido.estado === 'completado' ? '#27ae60' : 
+                                      pedido.estado === 'pendiente' ? '#f39c12' : '#e74c3c';
+                    
+                    tableHTML += `
+                        <tr>
+                            <td>${pedido.id}</td>
+                            <td>${pedido.producto}</td>
+                            <td>${pedido.usuario}</td>
+                            <td>${pedido.cantidad}</td>
+                            <td>$${pedido.precio}</td>
+                            <td style="color: ${estadoColor}; font-weight: bold;">${pedido.estado}</td>
+                            <td>${pedido.fecha_creacion}</td>
+                            <td>
+                                <button class="btn btn-warning" onclick="editarPedido(${pedido.id})">✏️</button>
+                                <button class="btn btn-danger" onclick="eliminarPedido(${pedido.id})">🗑️</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                tableHTML += '</tbody></table>';
+                document.getElementById('pedidosTable').innerHTML = tableHTML;
+                
+            } catch (error) {
+                document.getElementById('pedidosTable').innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function crearUsuario() {
+            const nombre = document.getElementById('nombreUsuario').value;
+            const email = document.getElementById('emailUsuario').value;
+            const telefono = document.getElementById('telefonoUsuario').value;
+            
+            if (!nombre) {
+                showMessage('El nombre es requerido', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:5003/usuarios', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey
+                    },
+                    body: JSON.stringify({ nombre, email, telefono })
+                });
+                
+                if (response.ok) {
+                    showMessage('Usuario creado exitosamente', 'success');
+                    document.getElementById('nombreUsuario').value = '';
+                    document.getElementById('emailUsuario').value = '';
+                    document.getElementById('telefonoUsuario').value = '';
+                    loadStats();
+                    loadUsuarios();
+                } else {
+                    const error = await response.json();
+                    showMessage(`Error: ${error.error || 'Error desconocido'}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function crearPedido() {
+            const usuarioId = document.getElementById('usuarioIdPedido').value;
+            const producto = document.getElementById('productoPedido').value;
+            const cantidad = document.getElementById('cantidadPedido').value;
+            const precio = document.getElementById('precioPedido').value;
+            const estado = document.getElementById('estadoPedido').value;
+            
+            if (!usuarioId || !producto) {
+                showMessage('Usuario ID y producto son requeridos', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:5003/pedidos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey
+                    },
+                    body: JSON.stringify({ 
+                        usuario_id: parseInt(usuarioId), 
+                        producto, 
+                        cantidad: parseInt(cantidad), 
+                        precio: parseFloat(precio), 
+                        estado 
+                    })
+                });
+                
+                if (response.ok) {
+                    showMessage('Pedido creado exitosamente', 'success');
+                    document.getElementById('usuarioIdPedido').value = '';
+                    document.getElementById('productoPedido').value = '';
+                    document.getElementById('cantidadPedido').value = '1';
+                    document.getElementById('precioPedido').value = '';
+                    loadStats();
+                    loadPedidos();
+                } else {
+                    const error = await response.json();
+                    showMessage(`Error: ${error.error || 'Error desconocido'}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function eliminarUsuario(id) {
+            if (!confirm(`¿Estás seguro de que quieres eliminar el usuario ${id}?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://localhost:5003/usuarios/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'X-API-Key': apiKey }
+                });
+                
+                if (response.ok) {
+                    showMessage('Usuario eliminado exitosamente', 'success');
+                    loadStats();
+                    loadUsuarios();
+                } else {
+                    const error = await response.json();
+                    showMessage(`Error: ${error.error || 'Error desconocido'}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function eliminarPedido(id) {
+            if (!confirm(`¿Estás seguro de que quieres eliminar el pedido ${id}?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://localhost:5003/pedidos/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'X-API-Key': apiKey }
+                });
+                
+                if (response.ok) {
+                    showMessage('Pedido eliminado exitosamente', 'success');
+                    loadStats();
+                    loadPedidos();
+                } else {
+                    const error = await response.json();
+                    showMessage(`Error: ${error.error || 'Error desconocido'}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function editarUsuario(id) {
+            showMessage('Función de edición próximamente disponible', 'error');
+        }
+        
+        function editarPedido(id) {
+            showMessage('Función de edición próximamente disponible', 'error');
+        }
+        
+        // Load initial data
+        window.onload = function() {
+            loadStats();
+            loadUsuarios();
+        };
+    </script>
+</body>
+</html>
+
